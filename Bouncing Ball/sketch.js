@@ -18,8 +18,8 @@ function draw() {
 }
 function mousePressed() {
   let ball = {
-    x: mouseX
-    y: mouseY
+    x: mouseX,
+    y: mouseY,
     diameter: random(25, 100),
     dx: random(-5, 5),
     dy: random(-5, 5),
@@ -31,15 +31,15 @@ function mousePressed() {
 function displayBall() {
   for (let i=0; i<theBouncingBalls.length; i++) {
     noStroke();
-    fill(theBouncingBalls[i].theColor)
-    ellipse(theBouncingBalls[i].x, theBouncingBalls[i].y, theBouncingBalls[i].diameter, theBouncingBalls[i].diameter)
+    fill(theBouncingBalls[i].theColor);
+    ellipse(theBouncingBalls[i].x, theBouncingBalls[i].y, theBouncingBalls[i].diameter, theBouncingBalls[i].diameter);
   }
 }
 
-function moveBall(); {
+function moveBall() {
   for (let ball of theBouncingBalls) {
-    ball.x += ball.dx
-    ball.y += ball.dy
+    ball.x += ball.dx;
+    ball.y += ball.dy;
   
     if (ball.x + ball.diameter/2 >= width || ball.x - ball.diameter/2 <= 0) {
       ball.dy *= -1;
