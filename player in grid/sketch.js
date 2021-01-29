@@ -43,7 +43,7 @@ function mousePressed() {
   }
 }
 
-function keyPressed() {
+function keyPressed(x, y) {
   if (key === "d" && playerX < COLS) { // dont go off screen
     movePlayer(playerX + 1, playerY, playerX, playerY);
     playerX++;
@@ -63,7 +63,7 @@ function keyPressed() {
 }
 
 function movePlayer(x, y, oldX, oldY) {
-  if (x >= 0  && x < COLS && y>= 0 && y < ROWS) {
+  if (x >= 0  && x < COLS && y>= 0 && y < ROWS && grid[y][x] !== 1) {
     grid[y][x] = 9; // new player location
     grid[oldY][oldX] = 0; // remove player from old spot
   }

@@ -1,44 +1,34 @@
-// Music Squares ?? or something??
+// Sokoban
 // Imani Fodje
 // 1/27/2021
 //
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
-let grid = [
-  [0, 0, 0, 0, 0, 0,],
-  [0, 0, 0, 0, 0, 0,],
-  [0, 0, 0, 0, 0, 0,],
-  [0, 0, 0, 0, 0, 0,],
-  [0, 0, 0, 0, 0, 0,],
-  [0, 0, 0, 0, 0, 0,],
-];
+let grid;
+let rows = 20;
+let cols = 20;
+let cellWidth, cellHeight;
+let playerX = 0;
+let playerY = 0;
 
-let squareSize = 50;
-let bgMusic;
-let rows, cols;
+//  puzzles
+let lvl0, lvl1, lvl2, lvl3, lvl4, lvl5;
+
+
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-
-  rows = grid.length;
-  cols = grid[0].length;
+  grid = createEmptyGrid(cols, rows);
+  cellWidth = width / cols;
+  cellHeight = height / rows;
+  grid[playerY][playerX] = 3;
 }
 
 function draw() {
   background(220);
   displayGrid();
-  mousePressed();
-}
-
-function mousePressed() {
-  let x = Math.floor(mouseX / squareSize);
-  let y =  Math.floor(mouseY / squareSize);
-  musicSquare();
-}
-
-function mouseReleased() {
-  
+  movePlayer();
 }
 
 function displayGrid() {
@@ -47,22 +37,99 @@ function displayGrid() {
       if (grid[y][x] === 0) {
         fill("white");
       }
-      if (grid[y][x] === 1) {
+      else if (grid[y][x] === 1) {
         fill("black");
       }
-      rect(x*squareSize, y*squareSize, squareSize, squareSize);
+      else if (grid[y][x] === 2) {
+        fill("brown");
+      }
+      else if (grid[y][x] === 3) {
+        fill("red");
+      }
+      else if (grid[y][x] === 4) {
+        fill("blue");
+      }
+      rect(x*cellWidth, y*cellHeight, cellWidth, cellHeight);
     }
-  } 
-}
-
-function musicSquare(x, y) {
-  if (x>= 0 && x<cols && y>= 0 && y<rows) {
-    if (grid[y][x] === 1) {
-      grid[y][x] = 0;
-    }
-    else if (grid[y][x] === 0) {
-      grid[y][x] = 1;
-    }
+    
   }
 }
-  
+
+function createEmptyGrid() {
+  let empty = [];
+  for (let y = 0; y < rows; y++) {
+    empty.push([]);
+    for (let x = 0; x < cols; x++) {
+      empty[y].push(0);
+    }
+  }
+  return empty;
+}
+
+function movePlayer(x, y, oldX, oldY, direction) {
+  if (x >= 0  && x < cols && y >= 0 && y < rows && grid[y][x] !== 1) {
+    // let oldNum = grid[y][x];
+    grid[y][x] = 3; // new player location
+    grid[oldY][oldX] = 0; // remove player from old spot
+    
+    if (direction === "right") {
+      playerX++;
+    }
+    if (direction === "left") {
+      playerX--;
+    }
+    if (direction === "up") {
+      playerY--;
+    }
+    if (direction === "down") {
+      playerY++;
+    }
+  }
+
+  // if (x >= 0  && x < cols && y>= 0 && y < rows && grid[y][x] === 2) {
+  //   let oldNum = grid[y][x];
+  //   grid[y][x] = 3; // new player location
+  //   grid[oldY][oldX] = oldNum; // remove player from old spot
+  //   pushBox();
+  // }
+}
+
+function keyPressed() {
+  if (key === "d" && playerX < cols) {
+    movePlayer(playerX + 1, playerY, playerX, playerY, "right");
+  }
+  if (key === "a" && playerX > 0) {
+    movePlayer(playerX - 1, playerY, playerX, playerY, "left");
+  }
+  if (key === "w" && playerY > 0) {
+    movePlayer(playerX, playerY - 1, playerX, playerY, "up");
+  }
+  if (key === "s" && playerY < rows) {
+    movePlayer(playerX, playerY + 1, playerX, playerY, "down");
+  }
+}
+
+function pushBox(x, y, oldX, oldY) {
+  if (x >= 0  && x < cols && y>= 0 && y < rows && grid[y][x] !== 1) {
+    grid[y][x] = 2; // new box location
+    grid[oldY][oldX] = 3; // remove box from old spot, replace with player
+  }
+}
+
+function mousePressed() {
+  let x = Math.floor(mouseX / cellWidth);
+  let y = Math.floor(mouseY / cellHeight);
+
+  if (grid[y][x] === 0) {
+    grid[y][x] = 1;
+  }
+  else if (grid[y][x] === 1) {
+    grid[y][x] = 2;
+  }
+  else if (grid[y][x] === 2) {
+    grid[y][x] = 4;
+  }
+  else if (grid[y][x] === 4) {
+    grid[y][x] = 0;
+  }
+}
