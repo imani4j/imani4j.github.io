@@ -31,6 +31,12 @@ function draw() {
   movePlayer();
 }
 
+// class Boxes {
+//   conductor() {
+
+//   }
+// }
+
 function displayGrid() {
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
@@ -66,8 +72,8 @@ function createEmptyGrid() {
   return empty;
 }
 
-function movePlayer(x, y, oldX, oldY, direction) {
-  if (x >= 0  && x < cols && y >= 0 && y < rows && grid[y][x] !== 1) {
+function movePlayer(x, y, oldX, oldY, direction, boxX, boxY, oldBoxX, oldBoxY) {
+  if (x >= 0  && x < cols && y >= 0 && y < rows && (grid[y][x] !== 1)) {
     // let oldNum = grid[y][x];
     grid[y][x] = 3; // new player location
     grid[oldY][oldX] = 0; // remove player from old spot
@@ -85,7 +91,27 @@ function movePlayer(x, y, oldX, oldY, direction) {
       playerY++;
     }
   }
-
+  if (x >= 0  && x < cols && y >= 0 && y < rows && grid[y][x] === 2) {
+    if (x >= 1  && x < cols - 1 && y >= 1 && y < rows - 1 && grid[y + 1][x] !== 1) {
+      
+    }
+    // let oldNum = grid[y][x];
+    grid[y][x] = 3; // new player location
+    grid[oldY][oldX] = 0; // remove player from old spot
+    
+    if (direction === "right") {
+      playerX++;
+    }
+    if (direction === "left") {
+      playerX--;
+    }
+    if (direction === "up") {
+      playerY--;
+    }
+    if (direction === "down") {
+      playerY++;
+    }
+  }
   // if (x >= 0  && x < cols && y>= 0 && y < rows && grid[y][x] === 2) {
   //   let oldNum = grid[y][x];
   //   grid[y][x] = 3; // new player location
@@ -96,7 +122,7 @@ function movePlayer(x, y, oldX, oldY, direction) {
 
 function keyPressed() {
   if (key === "d" && playerX < cols) {
-    movePlayer(playerX + 1, playerY, playerX, playerY, "right");
+    movePlayer(playerX + 1, playerY, playerX, playerY, "right". boxX + 1, boxY, boxX, boxY);
   }
   if (key === "a" && playerX > 0) {
     movePlayer(playerX - 1, playerY, playerX, playerY, "left");
