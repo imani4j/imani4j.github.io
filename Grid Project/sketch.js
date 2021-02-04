@@ -5,6 +5,12 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
+//  for moving boxes: if key is right {
+// if grid[y][x+1] === 2 {
+// move player and box
+// }
+// }
+
 let grid;
 let rows = 20;
 let cols = 20;
@@ -47,7 +53,7 @@ function displayGrid() {
         fill("black");
       }
       else if (grid[y][x] === 2) {
-        fill("brown");
+        fill("white");
       }
       else if (grid[y][x] === 3) {
         fill("red");
@@ -61,6 +67,8 @@ function displayGrid() {
   }
 }
 
+
+
 function createEmptyGrid() {
   let empty = [];
   for (let y = 0; y < rows; y++) {
@@ -72,8 +80,8 @@ function createEmptyGrid() {
   return empty;
 }
 
-function movePlayer(x, y, oldX, oldY, direction, boxX, boxY, oldBoxX, oldBoxY) {
-  if (x >= 0  && x < cols && y >= 0 && y < rows && (grid[y][x] !== 1)) {
+function movePlayer(x, y, oldX, oldY, direction) {
+  if (x >= 0  && x < cols && y >= 0 && y < rows && grid[y][x] !== 1) {
     // let oldNum = grid[y][x];
     grid[y][x] = 3; // new player location
     grid[oldY][oldX] = 0; // remove player from old spot
@@ -91,38 +99,11 @@ function movePlayer(x, y, oldX, oldY, direction, boxX, boxY, oldBoxX, oldBoxY) {
       playerY++;
     }
   }
-  if (x >= 0  && x < cols && y >= 0 && y < rows && grid[y][x] === 2) {
-    if (x >= 1  && x < cols - 1 && y >= 1 && y < rows - 1 && grid[y + 1][x] !== 1) {
-      
-    }
-    // let oldNum = grid[y][x];
-    grid[y][x] = 3; // new player location
-    grid[oldY][oldX] = 0; // remove player from old spot
-    
-    if (direction === "right") {
-      playerX++;
-    }
-    if (direction === "left") {
-      playerX--;
-    }
-    if (direction === "up") {
-      playerY--;
-    }
-    if (direction === "down") {
-      playerY++;
-    }
-  }
-  // if (x >= 0  && x < cols && y>= 0 && y < rows && grid[y][x] === 2) {
-  //   let oldNum = grid[y][x];
-  //   grid[y][x] = 3; // new player location
-  //   grid[oldY][oldX] = oldNum; // remove player from old spot
-  //   pushBox();
-  // }
 }
 
 function keyPressed() {
   if (key === "d" && playerX < cols) {
-    movePlayer(playerX + 1, playerY, playerX, playerY, "right". boxX + 1, boxY, boxX, boxY);
+    movePlayer(playerX + 1, playerY, playerX, playerY, "right");
   }
   if (key === "a" && playerX > 0) {
     movePlayer(playerX - 1, playerY, playerX, playerY, "left");
@@ -132,13 +113,6 @@ function keyPressed() {
   }
   if (key === "s" && playerY < rows) {
     movePlayer(playerX, playerY + 1, playerX, playerY, "down");
-  }
-}
-
-function pushBox(x, y, oldX, oldY) {
-  if (x >= 0  && x < cols && y>= 0 && y < rows && grid[y][x] !== 1) {
-    grid[y][x] = 2; // new box location
-    grid[oldY][oldX] = 3; // remove box from old spot, replace with player
   }
 }
 
