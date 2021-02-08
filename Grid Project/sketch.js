@@ -22,13 +22,25 @@ let player = {x: 0, y: 0, kind: 3, onTop: 0};
 let boxes = [];
 let obstacles = [];
 let goals = [];
+
+//  assets
+let firstPlayerImg, secondPlayerImg, wall, ground, goal, firstBox, secondBox;
 //  puzzles
 let lvl0, lvl1, lvl2, lvl3, lvl4, lvl5;
 
-
+function preload() {
+  firstPlayerImg = loadImage("assets/player.png");
+  secondPlayerImg = loadImage("assets/player2.png");
+  wall = loadImage("assets/wall.png");
+  ground = loadImage("assets/floor.png");
+  goal = loadImage("assets/goal.png");
+  firstBox = loadImage("assets/box.png");
+  secondBox= loadImage("assets/box2.png");
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  document.addEventListener("contextmenu", event => event.preventDefault());
   grid = createEmptyGrid(cols, rows);
   cellWidth = width / cols;
   cellHeight = height / rows;
@@ -183,35 +195,7 @@ function checkBox(direction) {
   } 
   return thebox;
 }
-
-// function movePlayer1(x, y, oldX, oldY, direction) {
-//   if (x >= 0  && x < cols && y >= 0 && y < rows && grid[y][x] !== 1) {
-//     // let oldNum = grid[y][x];
-
-//     if (direction === "right") {
-//       if (grid[y][x+1] === 2 && grid[y][x+2] !== 1) {
-//         grid[y][x+2] = 2;
-//         grid[y][x+1] = 0;
-//         playerX++;
-//       }
-//       else if (grid[y][x+1] !== 2) {
-//         playerX++;
-//       }
-//     }
-//     if (direction === "left") {
-//       playerX--;
-//     }
-//     if (direction === "up") {
-//       playerY--;
-//     }
-//     if (direction === "down") {
-//       playerY++;
-//     }
-//     grid[y][x] = 3; // new player location
-//     grid[oldY][oldX] = 0; // remove player from old spot
-//   }
-// }
-        
+      
 function pushBox(thebox, direction) {
   if (canMove(thebox, direction)) {
     moveObject(thebox, direction);
@@ -234,6 +218,9 @@ function keyPressed() {
   }
   if (key === "s") {
     theDirection = "down";
+  }
+  if (key === "n") {
+    console.log("you win");
   }
   
   if (canMove(player, theDirection)) {
@@ -265,15 +252,24 @@ function mousePressed() {
     }
     else if (grid[y][x] === 2) {
       obj = {x: x, y: y, kind: 4};
-      boxes.splice(boxes.length+1, 1);
+      for (let i=0; i<boxes.length; i++) {
+        if (boxes[i].x === x && boxes[i].y === y) {
+          boxes.splice(boxes[i]);
+          break;
+        }
+      }
       goals.push(obj);
       drawObject(obj);
     }
     else if (grid[y][x] === 4) {
-      goals.splice(goals.length+1, 1);
+      for (let i=0; i<goals.length; i++) {
+        if (goals[i].x === x && goals[i].y === y) {
+          goals.splice(goals[i]);
+          break;
+        }
+      }
       boxes.push(obj);
       drawObject(obj);
     }
   }
-  
 }
