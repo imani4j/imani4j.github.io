@@ -3,90 +3,117 @@
 // 1/27/2021
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// I made the sprites myself
+// this probably doesnt count as extra for experts, but:
+// The whole entire loadJSON thing got really weird at the end. Even though the json file was there, it wouldn't work.
+// All of the empty arrays I was trying to add to would end up undefined.
+// also Im very bad at creating puzzles. Level design is hard
 
 //  for moving boxes: if key is right {
 // if grid[y][x+1] === 2 {
 // move player and thebox
 // }
 // }
-    
+
+// glabal variables
 let grid;
 let rows = 20;
 let cols = 20;
 let cellWidth, cellHeight;
-let playerX = 0;
-let playerY = 0;
+let playerX = 3;
+let playerY = 4;
 
-let player = {x: 0, y: 0, kind: 3, onTop: 0};
+// objects + arrays
+
+const OBJECT_TYPE = {
+  empty: 0,
+  obstacle: 1,
+  box: 2,
+  player: 3,
+  goal: 4
+};
+
+let player = {x: playerX, y: playerY, kind: OBJECT_TYPE.player, onTop: 0};
 let boxes = [];
 let obstacles = [];
 let goals = [];
 
 //  assets
-let firstPlayerImg, secondPlayerImg, wall, ground, goal, firstBox, secondBox;
+let firstPlayerImg, wall, ground, goal, firstBox;
 //  puzzles
-let lvl0, lvl1, lvl2, lvl3, lvl4, lvl5;
+let currentLevel = 1;
 
+// preloading assets
 function preload() {
   firstPlayerImg = loadImage("assets/player.png");
-  secondPlayerImg = loadImage("assets/player2.png");
   wall = loadImage("assets/wall.png");
   ground = loadImage("assets/floor.png");
   goal = loadImage("assets/goal.png");
   firstBox = loadImage("assets/box.png");
-  secondBox= loadImage("assets/box2.png");
+  
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  let size = min(windowWidth, windowHeight);
+  createCanvas(size, size);
   document.addEventListener("contextmenu", event => event.preventDefault());
   grid = createEmptyGrid(cols, rows);
+  loadJSON(`assets/level-${currentLevel}.json`, loadLevel); //loads level
   cellWidth = width / cols;
   cellHeight = height / rows;
-  grid[playerY][playerX] = 3;
 }
 
 function draw() {
   background(220);
   displayGrid();
-
 }
 
-
+// displays grid
 function displayGrid() {
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
-      if (grid[y][x] === 0) {
-        fill("white");
+      if (grid[y][x] === OBJECT_TYPE.empty) {
+        image(ground, x*cellWidth, y*cellHeight, cellWidth, cellHeight);
       }
-      else if (grid[y][x] === 1) {
-        fill("black");
+      else if (grid[y][x] === OBJECT_TYPE.obstacle) {
+        image(wall, x*cellWidth, y*cellHeight, cellWidth, cellHeight);
       }
-      else if (grid[y][x] === 2) {
-        fill("brown");
+      else if (grid[y][x] === OBJECT_TYPE.box) {
+        image(firstBox, x*cellWidth, y*cellHeight, cellWidth, cellHeight);
       }
-      else if (grid[y][x] === 3) {
-        fill("red");
+      else if (grid[y][x] === OBJECT_TYPE.player) {
+        image(firstPlayerImg, x*cellWidth, y*cellHeight, cellWidth, cellHeight);
       }
-      else if (grid[y][x] === 4) {
-        fill("LightBlue");
+      else if (grid[y][x] === OBJECT_TYPE.goal) {
+        image(goal, x*cellWidth, y*cellHeight, cellWidth, cellHeight);
       }
-      rect(x*cellWidth, y*cellHeight, cellWidth, cellHeight);
     }
     
   }
 }
 
-function doYouWin() {
+function clearGrid() {
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      grid[y][x] = OBJECT_TYPE.empty;
+      image(ground, x*cellWidth, y*cellHeight, cellWidth, cellHeight);
+    }
+  }
+}
+
+function checkWin() { // checks to see if you've completed the level
   let numberOfBoxesDone = 0;
-  for (let i=0; i<boxes.length+1; i++) {
-    if (boxes[i].onTop === 4) {
+  for (let i=0; i<boxes.length; i++) {
+    if (boxes[i].onTop === OBJECT_TYPE.goal) {
       numberOfBoxesDone++;
     }
   }
-  if (numberOfBoxesDone === boxes.length) {
-    console.log("you win yay");
+  if (numberOfBoxesDone === goals.length) {
+    console.log("You win!");
+    if (currentLevel < 3) {
+      currentLevel++;
+      loadJSON(`assets/level-${currentLevel}.json`, loadLevel);
+    }
   }
 }
 
@@ -108,10 +135,11 @@ function drawObject(object) {
 
 function clearObject(object) {
   grid[object.y][object.x] = object.onTop;
-  object.onTop = 0;
+  object.onTop = OBJECT_TYPE.empty;
 }
 
 function moveObject(object, direction) {
+  // responsible for moving all the objects
   let xOff = 0;
   let yOff = 0;
   let spotValue = 0;
@@ -133,13 +161,14 @@ function moveObject(object, direction) {
   object.x += xOff;
   object.y += yOff;
   
-  spotValue = grid[object.y][object.x];
+  spotValue = grid[object.y][object.x]; // records value of spot before object moves to it
   drawObject(object);
-  object.onTop = spotValue;
+  object.onTop = spotValue; // sets object's onTop to the spotValue. that way the spot can change back when they move off
   
 }
 
 function canMove(object, direction) {
+  // checks to see if player can move
   let xOff = 0;
   let yOff = 0;
   
@@ -156,7 +185,7 @@ function canMove(object, direction) {
     yOff = 1;
   }
   
-  if  (grid[object.y+yOff][object.x+xOff] === 0 || grid[object.y+yOff][object.x+xOff] === 4) {
+  if  (grid[object.y+yOff][object.x+xOff] === OBJECT_TYPE.empty || grid[object.y+yOff][object.x+xOff] === OBJECT_TYPE.goal) {
     return true;
   }
   else {
@@ -165,6 +194,7 @@ function canMove(object, direction) {
 }
 
 function checkBox(direction) {
+  // checks to see if the player is moving into a box or not
   let thebox = null;
   let xOff = 0;
   let yOff = 0;
@@ -181,13 +211,11 @@ function checkBox(direction) {
     yOff = 1;
   }
 
-  if (grid[player.y+yOff][player.x+xOff] === 2) {
-    console.log("found box");
+  if (grid[player.y+yOff][player.x+xOff] === OBJECT_TYPE.box) {
     let i = 0;
     while (i < boxes.length) {
       if (boxes[i].y === player.y+yOff && boxes[i].x === player.x+xOff) {
         thebox = boxes[i];
-        console.log(thebox);
         break;
       }
       i++;
@@ -200,12 +228,16 @@ function pushBox(thebox, direction) {
   if (canMove(thebox, direction)) {
     moveObject(thebox, direction);
     moveObject(player, direction);
+    if (thebox.onTop === OBJECT_TYPE.goal) {
+      checkWin();
+    }
   }
 }
 
 
 
 function keyPressed() {
+  // controls
   let theDirection;
   if (key === "d") {
     theDirection = "right";
@@ -218,9 +250,6 @@ function keyPressed() {
   }
   if (key === "s") {
     theDirection = "down";
-  }
-  if (key === "n") {
-    console.log("you win");
   }
   
   if (canMove(player, theDirection)) {
@@ -235,6 +264,7 @@ function keyPressed() {
 }
 
 function mousePressed() {
+  // This was used to test and create levels. I've kept it so you can mess around with it
   let x = Math.floor(mouseX / cellWidth);
   let y = Math.floor(mouseY / cellHeight);
   let obj;
@@ -254,7 +284,7 @@ function mousePressed() {
       obj = {x: x, y: y, kind: 4};
       for (let i=0; i<boxes.length; i++) {
         if (boxes[i].x === x && boxes[i].y === y) {
-          boxes.splice(boxes[i]);
+          boxes.splice(i, 1);
           break;
         }
       }
@@ -264,7 +294,7 @@ function mousePressed() {
     else if (grid[y][x] === 4) {
       for (let i=0; i<goals.length; i++) {
         if (goals[i].x === x && goals[i].y === y) {
-          goals.splice(goals[i]);
+          goals.splice(i, 1);
           break;
         }
       }
@@ -272,4 +302,34 @@ function mousePressed() {
       drawObject(obj);
     }
   }
+}
+
+function loadLevel(level) {
+  // takes the objects saved in the JSON files and draws them
+  boxes = level.boxes;
+  goals = level.goals;
+  obstacles = level.obstacles;
+  player = level.player;
+  clearGrid();
+  for (const box of boxes) {
+    drawObject(box);
+  }
+  for (const obstacle of obstacles) {
+    drawObject(obstacle);
+  }
+  for (const goal of goals) {
+    drawObject(goal);
+  }
+  drawObject(player);
+}
+
+function saveLevel(number) {
+  // was used to save levels
+  let level = {
+    boxes: boxes,
+    goals: goals,
+    obstacles: obstacles,
+    player: player,
+  };
+  saveJSON(level, "level-" + number);
 }
